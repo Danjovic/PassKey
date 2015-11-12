@@ -15,6 +15,9 @@
 * 
 * Version .6 - november 4, 2015
 * Basic Functionality
+*
+* Version .65 - november 11, 2015
+* Added selective control by Scroll Lock/Num Lock
 * 
 */
 
@@ -43,6 +46,7 @@
 #define MSG_BUFFER_SIZE 14 // MAX_PASSWORD_SLOTS + 2 
 
 EEMEM uchar stored_password[MAX_PASSWORD_SLOTS][MSG_BUFFER_SIZE];
+
 
 
 // ************************
@@ -101,15 +105,25 @@ static uchar idleRate; // repeat rate for keyboards
 #define STATE_SEND 1
 #define STATE_DONE 0
 
+
+#define _UL_bit 7   // just Uploade bit  
+#define _NL_bit 5   // NUM_LOCK bit
+#define _SL_bit 4   // SCROLL_LOCK bit
+
 static uchar messageState = STATE_DONE;
 static uchar messageBuffer[MSG_BUFFER_SIZE] = "";
 static uchar messagePtr = 0;
 static uchar messageCharNext = 1;
 
 static uchar slot=0;
+static uchar usage_flags;  // use Scroll Lock / Num Lock
+
+
+
+
 static uchar display_state=0;   // keep track of the segments lit (plus decimal point)
 
-static uchar usage_flags=0x03;  // Bit 2-> Use Scroll Lock, Bit 1-> Use Caps Lock, Bit 0->Use Num Lock
+
 enum {
 	_no_press = 0,
 	_short_press,    
@@ -122,7 +136,6 @@ enum {
 // Debouncing Routine. This routine uses timer2 as a time base, counting up
 // when the bit 5 of the timer toggles and the button stays pressed. 
 // 1 tick at each 1024/16Mhz=64us -> 64us/32=2ms.  255 ticks=510ms
-
 #define B1_Pressed ((PINB & (1<<1))==0) // SELECT
 #define B2_Pressed ((PIND & (1<<1))==0) // SEND
 #define treshold_short_press 50  
@@ -273,12 +286,18 @@ void advance_slot (void) {
 }
 
 //
-// Setup for sending the password
+// Setup for sending the password. 
 //
 void set_to_send_password(void) {
+uint8_t i;
 		eeprom_read_block(messageBuffer, &stored_password[slot][0], sizeof(messageBuffer));
 		messagePtr = 0;
 		messageState = STATE_SEND;		
+
+		// also update the configuration flags
+		i= usage_flags + slot;
+		eeprom_write_byte ( (uint8_t*)E2END, i); 
+		
 }
 
 
@@ -301,13 +320,16 @@ usbMsgLen_t usbFunctionWrite(uint8_t * data, uchar len) {
 	if (changed & CAPS_LOCK ) caps_toggle();
 	
 	if (changed & SCROLL_LOCK ) {     // scroll lock 
-        // if (USE_SCROLL_LOCK)	
-		set_to_send_password();		
+        
+        if ( usage_flags & (1<<_SL_bit ) ) {    // if SCROLL_LOCK is set to use		
+			set_to_send_password();	            // arrange to send password	
+		}
 	}
 	
-	if (changed & NUM_LOCK ) {  // advance slot, roll back at maximum 
-	    // if (USE_NUM_LOCK)
-		advance_slot();			
+	if (changed & NUM_LOCK ) {  
+	     if ( usage_flags & (1<<_NL_bit ) ) {   // if NUM_LOCK is set to use
+			advance_slot();		                // advance slot, roll back at maximum 
+		}	
 	}
 	
 	return 1; // Data read, not expecting more
@@ -429,16 +451,12 @@ void refresh_display( uint8_t segments) {
 //  
                       
 int main() {
-	uchar i;
+	uint8_t i,j;
 
-	// Fetch password from EEPROM and send it
-	//set_to_send_password();
-	
 	for(i=0; i<sizeof(keyboard_report); i++) // clear report initially
 	((uchar *)&keyboard_report)[i] = 0;
 	
 	wdt_enable(WDTO_1S); // enable 1s watchdog timer
-
 	usbInit();
 	
 	usbDeviceDisconnect(); // enforce re-enumeration
@@ -461,6 +479,40 @@ int main() {
 	
 	PORTB |= (1<<1) ; // button 2 pullup
 	PORTD |= (1<<1) ; // button 1 pullup
+
+
+	// Fetch configuration byte from the last address of EEPROM
+	// Format:
+	//  7  6  5  4  3  2  1  0
+	//  UL 0  NL SL [  slot  ]
+    //  |     |  |           
+    //  |     |  |           
+    //  |     |  |           
+	//  |     |  +------- Num Lock actuation (0 = no actuation)
+	//  |     +---------- Scroll Lock actuation ( 0 = no actuation )
+	//  +---------------- flag set after passwords uploading (or when EEPROM is empty)
+    i = eeprom_read_byte ( (const uint8_t *)E2END );	
+
+	if (i & (1<<_UL_bit) ) { 
+		// initialize configuration byte after uploading or EEPROM empty (first usage)
+		i = (1<<_NL_bit) | (1<<_SL_bit);
+		eeprom_write_byte ( (uint8_t*)E2END, i);
+		slot =0;
+		
+	} else {
+		slot = i & 0x0f;  // initialize at the last used slot
+		j = i ;           // save value for later comparisson
+		if (B1_Pressed) i ^= (1<<_NL_bit); // toggle state of NUM LOCK usage if SELECT is press during boot
+		if (B2_Pressed) i ^= (1<<_SL_bit); // toggle state of SCRLOLL LOCK usage if SEND is press during boot
+		
+		if (i!=j) eeprom_write_byte ( (uint8_t*)E2END, i); // update in case of change
+	};
+
+    usage_flags = i & ( (1<<_NL_bit) | (1<<_SL_bit ) ) ;          // save/update usage flags
+
+    // 
+
+
 	
 	// Initialize display state
 	display_state = pgm_read_byte ( digitos + slot);      // update number being displayed
