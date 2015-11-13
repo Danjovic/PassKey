@@ -132,49 +132,56 @@ these macros are defined, the boot loader usees them.
 
 #ifndef __ASSEMBLER__   /* assembler cannot parse function definitions */
 
-#define JUMPER_BIT0  1   // Button SEND on PB1
-#define JUMPER_BIT1  1   // Button SELECT on PD1
 
 
-#ifndef MCUCSR          /* compatibility between ATMega8 and ATMega88 */
+//
+//  Definitions for boot condition: Both buttons pressed 
+//  
+#define BIT_BT1 1   // Button SEND on PB1
+#define BIT_BT2 1   // Button SELECT on PD1
+
+//#define DDR_BT1 DDRB  // no need to use, since all pins are inputs 
+//#define DDR_BT2 DDRD  // right after the Reset
+
+#define PORT_BT1 PORTB
+#define PORT_BT2 PORTD
+
+#define PIN_BT1  PINB
+#define PIN_BT2  PIND
+
+// compatibility between ATMega8 and ATMega88
+#ifndef MCUCSR         
 #   define MCUCSR   MCUSR
 #endif
 
 static inline void  bootLoaderInit(void)
 {
   
-//    PORTD |= (1 << JUMPER_BIT1);     // activate pull-ups  
-//	PORTB |= (1 << JUMPER_BIT0); 
+    PORT_BT1 |= (1 << BIT_BT1);     // activate pull-ups  
+    PORT_BT2 |= (1 << BIT_BT2); 
 
-  
-
- //   if(!(MCUCSR & (1 << PORF)))    // If this was not a power on reset, ignore  
-    if(!(MCUCSR & (1 << EXTRF)))    // If this was not an external reset, ignore 
-        leaveBootloader();
-    MCUCSR = 0;                     // clear all reset flags for next time  
+    if (((PIN_BT1 & (1 << BIT_BT1)) | (PIN_BT2 & (1 << BIT_BT2))) == 0 ) {   // if both buttons down
 	
-/*  	
-    // Conditions that bootloader comes up:
-    // 1. reset button is pushed(External Reset)
-    // 2. jump from application with MCUSR = 0
-    if (MCUSR == 0 || MCUCSR & (1<<EXTRF)) {   //PORF
+        // Update Configuration byte when entering bootloader     // UL 0  NL SL [  slot  ]
+		eeprom_write_byte ((uint8_t *)E2END, 0xb0);               // 1  0  1  1     0000	   => 0xb0
+		
         MCUCSR = 0;
-        return;
+        return;  // continue to bootloader
     }
+
     // go to applicaton
-    leaveBootloader(); 
-*/	
-	
+    leaveBootloader(); 	
 }
 
 
 static inline void  bootLoaderExit(void)
 {
-//  PORTD = 0;                      // undo bootLoaderInit() changes  
-//  PORTB = 0; 
+  PORT_BT1 = 0;                      // undo bootLoaderInit() changes  
+  PORT_BT2 = 0; 
 }
 
-#define bootLoaderCondition() (1) // (( (PINB & (1 << JUMPER_BIT0)) | (PIND & (1 << JUMPER_BIT1))  )== 0)
+#define bootLoaderCondition() (1) // Always true, otherwise both buttons should be pressed all the time 
+                                  // during upload
 
 #endif /* __ASSEMBLER__ */
 
