@@ -13,17 +13,3 @@ R5     CRCW0805470RFKEA     Thick Film Resistors, 470 Ohms, 1/8watt, 1%, 0805 pa
 XT1    HCM49-16.000MABJ-UT  Crystal 16MHz  HC49S SMD                                      http://br.mouser.com/ProductDetail/Citizen/HCM49-16000MABJ-UT/?qs=%2fha2pyFaduiVHToR3%252b1wGN3S69A4tFmj5z0PMR5OtwQ%252byZ9bECIynW9toHMh9rf9
 S1,S2  B3F-3122             Tactile Switch R/A 6X6 3.85mm BTN                             http://br.mouser.com/ProductDetail/Omron/B3F-3122/?qs=%2fha2pyFaduh%2f%252boBDD%252bux0v7jK4zpiWPzZx8lqimIGEtFuNSTC0qQEw%3d%3d
 K1     48037-0001           USB Connector TYPE A RA SHLDED PLG THRU-HOLE AU               http://br.mouser.com/ProductDetail/Molex/48037-0001/?qs=%2fha2pyFaduinMl8uohyjMe6YZYgp2j6CnudoqvbRJ1c%3d
-
-Part   Part Number          Link
-IC1    ATMega8-16AU         http://br.mouser.com/ProductDetail/Atmel/ATmega8-16AU/?qs=sGAEpiMZZMvqv2n3s2xjsVIKSdqlAUq6z54aCTlntIM%3d
-DS1    SC56-11GWA           http://br.mouser.com/ProductDetail/Kingbright/SC56-11GWA/?qs=%2fha2pyFadug7Mdf%2fXh0i73RyHvw1b2RRNKkKduB8wt0%3d
-D1,D2  ZMM5226B             http://br.mouser.com/ProductDetail/Rectron/ZMM5226B/?qs=%2fha2pyFaduhwRV5rEbrK%2fFJ2YqGja3lN9D5Je9oo9m3BL2EqtvR0AQ%3d%3d 
-C1     12065C104KAT2A       http://br.mouser.com/ProductDetail/AVX/12065C104KAT2A/?qs=sGAEpiMZZMsh%252b1woXyUXj%2fQOiMy2nwZAegeDXPYKDmA%3d                                                                                                                                                                                                                                                    
-C2,C3  VJ0805A220JXGAT5Z    http://br.mouser.com/ProductDetail/Vishay-Vitramon/VJ0805A220JXGAT5Z/?qs=sGAEpiMZZMukHu%252bjC5l7YaMIDJ0ksSe0uGMqvHUh5Do%3d
-R1     CRCW08052K20FKEA     http://br.mouser.com/ProductDetail/Vishay-Dale/CRCW08052K20FKEA/?qs=sGAEpiMZZMuMxemD0lCBEQzL59S3xDaM                                                                                                                                  
-R2,R3  CRCW080568R0FKEA     http://br.mouser.com/ProductDetail/Vishay-Dale/CRCW080568R0FKEA/?qs=sGAEpiMZZMu61qfTUdNhG2DpbjADlD3GMxLW745eEY4%3d
-R4     CRCW080510K0FKEA     http://br.mouser.com/ProductDetail/Vishay-Dale/CRCW080510K0FKEA/?qs=sGAEpiMZZMu61qfTUdNhG2DpbjADlD3GOIdKSeOTyFU%3d                                                                                                                                          
-R5     CRCW0805470RFKEA     http://br.mouser.com/ProductDetail/Vishay-Dale/CRCW0805470RFKEA/?qs=sGAEpiMZZMu61qfTUdNhG2DpbjADlD3GUDzG2zZXJp8%3d 
-XT1    HCM49-16.000MABJ-UT  http://br.mouser.com/ProductDetail/Citizen/HCM49-16000MABJ-UT/?qs=%2fha2pyFaduiVHToR3%252b1wGN3S69A4tFmj5z0PMR5OtwQ%252byZ9bECIynW9toHMh9rf9
-S1,S2  B3F-3122             http://br.mouser.com/ProductDetail/Omron/B3F-3122/?qs=%2fha2pyFaduh%2f%252boBDD%252bux0v7jK4zpiWPzZx8lqimIGEtFuNSTC0qQEw%3d%3d
-K1     48037-0001           http://br.mouser.com/ProductDetail/Molex/48037-0001/?qs=%2fha2pyFaduinMl8uohyjMe6YZYgp2j6CnudoqvbRJ1c%3d
